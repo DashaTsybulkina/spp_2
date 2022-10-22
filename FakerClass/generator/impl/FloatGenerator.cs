@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace FakerClass.generator.impl
 {
-    internal class FloatGenerator
+    internal class FloatGenerator:IGenerator
     {
         public object Generate()
         {

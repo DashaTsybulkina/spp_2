@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace FakerClass.generator.impl
 {
-    public class DoubleGenerator
+    public class DoubleGenerator:IGenerator
     {
         public object Generate()
         {

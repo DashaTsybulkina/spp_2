@@ -4,6 +4,7 @@ using System.Reflection.PortableExecutable;
 using System.Text.RegularExpressions;
 using FakerClass.generator;
 using FakerClass.generator.impl;
+using Microsoft.VisualBasic.FileIO;
 
 namespace FakerClass
 {
@@ -19,39 +20,6 @@ namespace FakerClass
             _generators = new Dictionary<Type, IGenerator>();
             loadGeneratorsFromDirectory();
             loadGeneratorsFromPackage();
-        }
-
-        public T create<T>()
-        {
-            return (T)createByType(typeof(T));
-        }
-
-        public object createByType(Type type)
-        {
-            if (type.IsAbstract)
-                return default;
-
-            if (_generators.TryGetValue(type, out var _generator))
-            {
-                return _generator.Generate();
-            }
-
-            if (type.IsEnum)
-            {
-                Array enumValues = type.GetEnumValues();
-                Random random = new Random();
-                return enumValues.GetValue(random.Next(0, enumValues.Length));
-            }
-            if (type.IsClass)
-            {
-                var inst = CreateThroughConstructor(type);
-                if (inst == null)
-                    return default;
-                return inst;
-            }
-
-            return default;
-
         }
 
         private void loadGeneratorsFromDirectory()
@@ -94,6 +62,70 @@ namespace FakerClass
             _generators.Add(typeof(long), new LongGenerator());
         }
 
+        public T create<T>()
+        {
+            return (T)createByType(typeof(T));
+        }
+
+        public object createByType(Type type)
+        {
+            if (type.IsAbstract)
+                return default;
+
+            if (_generators.TryGetValue(type, out var _generator))
+            {
+                return _generator.Generate();
+            }
+
+            if (type.IsEnum)
+            {
+                Array enumValues = type.GetEnumValues();
+                Random random = new Random();
+                return enumValues.GetValue(random.Next(0, enumValues.Length));
+            }
+            if (type.IsClass)
+            {
+                var inst = CreateThroughConstructor(type);
+                if (inst == null)
+                    return default;
+                initFields(inst, type.GetFields());
+                initProperties(inst, type.GetProperties());
+                return inst;
+            }
+
+            return default;
+
+        }
+
+        private void initFields(object inst, FieldInfo[] fields)
+        {
+            var defaultConstr = inst.GetType().GetConstructors()[0];
+            var defaultObj = defaultConstr.Invoke(new object[defaultConstr.GetParameters().Length]);
+            foreach (var field in fields)
+            {
+                var defaultValue = field.GetValue(defaultObj);
+                var value = field.GetValue(inst);
+                if ((defaultValue != null && value != null)) continue;
+                if (value != null && !defaultValue.Equals(value)) continue;
+                field.SetValue(inst, createByType(field.FieldType));
+            }
+        }
+
+        private void initProperties(object inst, PropertyInfo[] properties)
+        {
+            var defaultConstr = inst.GetType().GetConstructors()[0];
+            var defaultObj = defaultConstr.Invoke(new object[defaultConstr.GetParameters().Length]);
+            foreach (var property in properties)
+            {
+                var defaultValue = property.GetValue(defaultObj);
+                var value = property.GetValue(inst);
+                if ((defaultValue == null && value != null)) continue;
+                if (value != null && !defaultValue.Equals(value)) continue;
+                if (property.SetMethod != null && (property.SetMethod.IsPrivate | property.SetMethod.IsFamily))
+                    continue;
+                property.SetValue(inst, createByType(property.PropertyType));
+            }
+        }
 
         private object CreateThroughConstructor(Type type)
         {

@@ -9,10 +9,10 @@ namespace FakerClass.test_class
     public class Foo
     {
 
-        public string sdf;
+        public string testString;
         public char testChar;
         public int AAA = 123;
-
+        public Boo testBoo;
         public int a, b;
         public string TestStr = "It's const str";
 
@@ -26,7 +26,6 @@ namespace FakerClass.test_class
             this.a = a;
             this.b = b;
         }
-
 
         public Foo()
         {

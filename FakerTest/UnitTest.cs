@@ -23,6 +23,19 @@ namespace FakerTest
             Assert.IsTrue(foo.b != 0);
         }
 
+        [TestMethod]
+        public void TestClassBoo()
+        {
+            var foo = faker.create<Foo>();
+            Assert.IsNotNull(foo.testBoo);
+        }
+
+        [TestMethod]
+        public void TestClassFloatProperty()
+        {
+            var foo = faker.create<Foo>();
+            Assert.IsTrue(foo.testBoo.testFloat != 0);
+        }
 
     }
 }

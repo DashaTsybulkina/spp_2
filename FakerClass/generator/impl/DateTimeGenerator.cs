@@ -11,7 +11,7 @@ namespace FakerClass.generator.impl
         public object Generate()
         {
             Random random = new Random();
-            var year = random.Next(1, int.MaxValue);
+            var year = random.Next(1, 1999);
             var month = random.Next(1, 12);
             var day = random.Next(1, DateTime.DaysInMonth(year, month));
 

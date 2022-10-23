@@ -60,6 +60,7 @@ namespace FakerClass
             _generators.Add(typeof(float), new FloatGenerator());
             _generators.Add(typeof(short), new ShortGenerator());
             _generators.Add(typeof(long), new LongGenerator());
+            _generators.Add(typeof(List<int>), new ListGenerator<int>());
         }
 
         public T create<T>()
@@ -85,11 +86,17 @@ namespace FakerClass
             }
             if (type.IsClass)
             {
+                if (_listType.Contains(type))
+                {
+                    return default;
+                }
+                _listType.Add(type);
                 var inst = CreateThroughConstructor(type);
                 if (inst == null)
                     return default;
                 initFields(inst, type.GetFields());
                 initProperties(inst, type.GetProperties());
+                _listType.Remove(type);
                 return inst;
             }
 

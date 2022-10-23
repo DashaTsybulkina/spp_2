@@ -37,5 +37,34 @@ namespace FakerTest
             Assert.IsTrue(foo.testBoo.testFloat != 0);
         }
 
+        [TestMethod]
+        public void TestClassBooConstructor()
+        {
+            var boo = faker.create<Boo>();
+            Console.WriteLine(boo);
+            Assert.IsNotNull(boo);
+        }
+
+        [TestMethod]
+        public void TestClassDataTimeFiledConstructor()
+        {
+            var boo = faker.create<Boo>();
+            Assert.IsTrue(!boo.testDateTime.Equals(null));
+        }
+
+        [TestMethod]
+        public void TestClassIntArray()
+        {
+            var boo = faker.create<Boo>();
+            Assert.IsNotNull(boo.IntArray);
+        }
+
+        [TestMethod]
+        public void TestClassPrivateIntFlied()
+        {
+            var boo = faker.create<Boo>();
+            Assert.IsTrue(boo.getTestInteger() == 0);
+        }
+
     }
 }
